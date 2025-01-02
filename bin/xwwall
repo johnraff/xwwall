@@ -280,7 +280,8 @@ confirm_gui() {
 
 # populate the main GUI
 button_gui() {
-	local c i j WALL V buttonsx buttons
+	local c i j WALL V buttonsx
+	BUTTONS=
 	c=0
 	shopt -s globstar
 	for WALL in "$BGDIR"/*{,/**}
@@ -308,11 +309,11 @@ button_gui() {
 	done
 	shopt -u globstar
 	for j in "${!buttonsx[@]}"
-	do buttons+="		<hbox>
+	do BUTTONS+="		<hbox>
 		${buttonsx[j]}
 		</hbox>"$'\n'
 	done
-	echo "$buttons" > "$TEMP/buttons"
+	export BUTTONS
 }
 
 # sub GUI
@@ -402,7 +403,7 @@ sub_gui() {
 main_gui() {
 	[[ -z "$SWIDTH" ]] && SWIDTH=0
 	[[ -r "$TEMP/main_gui.xml" ]] && _splash "Please wait ..." 6 2 &
-	BUTTONS=$(cat $TEMP/buttons)
+#	BUTTONS=$(cat $TEMP/buttons)
 	export MAINGUI='<window icon-name="xwwall" title="'$PROG' - Background Choice">
   <vbox>
     <hbox space-expand="true" space-fill="true">
