@@ -110,7 +110,7 @@ else
 fi
 
 #CSS for splash
-echo 'window#splash {
+export WIN_CSS='window#splash {
 	background: rgba(0,0,0,0.0);
 }
 #splash {
@@ -122,9 +122,7 @@ echo 'window#splash {
 #sep {
 	background: rgba(0,0,0,0.0);
 }
-' > "$TEMP/win.css"
-
-
+'
 
 # get the primary output
 [[ -z "$TWIDTH" ]] && TWIDTH=9
@@ -229,7 +227,7 @@ _splash() {
 			</button>
 		</hbox>
 	</vbox>
-</window>' | $GTK3DIALOG -s "$CR" --styles=$TEMP/win.css
+</window>' | $GTK3DIALOG -s "$CR" --styles=<( printf '%s' "$WIN_CSS" )
 	[[ "$2" == '1' ]] && exit $2
 }; export -f _splash
 
@@ -269,7 +267,7 @@ confirm_gui() {
 	  </hbox>
 	</vbox>
 </window>'
-	eval "$($GTK3DIALOG -p CON -c --styles=$TEMP/win.css)"
+	eval "$($GTK3DIALOG -p CON -c --styles=<( printf '%s' "$WIN_CSS" ))"
 	case $EXIT in
 		Yes)_build_command;;
 		REFRESH)rm -f $TEMP/increment $TEMP/selected $TEMP/[XW]set rm -f $TEMP/ret
@@ -396,7 +394,7 @@ sub_gui() {
 	  </hbox>
 	</vbox>
    </window>'
-	$GTK3DIALOG -p SUBGUI -c --styles=$TEMP/win.css
+	$GTK3DIALOG -p SUBGUI -c --styles=<( printf '%s' "$WIN_CSS" )
 }; export -f sub_gui
 
 # populate the main GUI
@@ -439,7 +437,7 @@ main_gui() {
   </vbox>
 </window>'
 	[[ -r "$TEMP/main_gui.xml" ]] || printf "%s\n" "$MAINGUI" > $TEMP/main_gui.xml
-	eval "$($GTK3DIALOG -f $TEMP/main_gui.xml -c --styles=$TEMP/win.css)"
+	eval "$($GTK3DIALOG -f $TEMP/main_gui.xml -c --styles=<( printf '%s' "$WIN_CSS" ))"
 	if [[ "$EXIT" == "PREFS" ]]; then
 		_pref
 	fi
@@ -552,7 +550,7 @@ _pref() {
     </hbox>
   </vbox>
 </window>'
-	eval "$($GTK3DIALOG -p PGUI -c --styles=$TEMP/win.css)"
+	eval "$($GTK3DIALOG -p PGUI -c --styles=<( printf '%s' "$WIN_CSS" ))"
 	if [[ -d "$BACKGROUNDS" ]]; then
 		sed -i "s%^BGDIR.*$%BGDIR=\"$BACKGROUNDS\"%" $CONF
 		rm -f "$TEMP/buttons"
