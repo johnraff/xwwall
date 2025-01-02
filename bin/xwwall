@@ -628,7 +628,7 @@ export PID=$$
 
 if [[ -n "$WAYLAND_DISPLAY" ]]; then
 	case "$XDG_CURRENT_DESKTOP" in # sway on it's own may not set XDG_CURRENT_DESKTOP
-		wlroots|labwc|sway*|river|niri|hyprland|Bunsen*)echo "$XDG_CURRENT_DESKTOP";; # this can be expanded later
+		wlroots|labwc*|sway*|river|niri|hyprland|Bunsen*)echo "$XDG_CURRENT_DESKTOP";; # this can be expanded later
 		*)pidof sway >/dev/null 2>&1 || _splash "Unfortunately your desktop $XDG_CURRENT_DESKTOP is unsupported" 5;;
 	esac
 fi
