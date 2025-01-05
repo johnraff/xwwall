@@ -70,7 +70,8 @@ if [[ -n "$WAYLAND_DISPLAY" ]]; then
 		echo Y=$resY >> "$TEMP/Wmonitor-$c"
 		c=$((c+1))
 		b=$((b+1))
-		echo $b > $TEMP/number
+#		echo $b > $TEMP/number
+		NUM=$b
 	done <<<$(wlr-randr)
 	export POPT='edge="top" dist="100"'
 	export SOPT='layer="top"'
@@ -102,7 +103,8 @@ else
 		echo POS=$pos >> "$TEMP/Xmonitor-$n"
 		n=$((n+1))
 		k=$((k+1))
-		echo $k > $TEMP/number
+#		echo $k > $TEMP/number
+		NUM=$k
 	done <<<$(xrandr --listmonitors)
 	export POPT='decorated="false"'
 	export SOPT=$POPT
@@ -134,6 +136,7 @@ case $TWIDTH in
 	 8)THEIGHT=12;;
 esac
 e=0
+export NUM
 if [[ -n "$WAYLAND_DISPLAY" ]]; then
 	for i in $TEMP/Wmonitor*
 	do
@@ -144,8 +147,8 @@ if [[ -n "$WAYLAND_DISPLAY" ]]; then
 		[[ $POS -gt $X ]] && echo "$OUTPUT = extra" && cp $i $TEMP/ww2$e && e=$((e+1))
 	done
 	rm $TEMP/Wmonitor* # finished with these
-	read -r NUM < "$TEMP/number"
-	export NUM
+#	read -r NUM < "$TEMP/number"
+#	export NUM
 	echo $NUM outputs
 	. $TEMP/ww0
 	export Wdth=$((X / TWIDTH))
@@ -162,8 +165,8 @@ else
 		[[ $POS -gt $X ]] && echo "$OUTPUT = extra" && cp $i $TEMP/xx2$e && e=$((e+1))
 	done
 	rm $TEMP/Xmonitor* # finished with these
-	export NUM
-	read NUM < $TEMP/number
+#	export NUM
+#	read NUM < $TEMP/number
 	echo $NUM outputs
 	. $TEMP/xx0
 	export Wdth=$((X / TWIDTH))
