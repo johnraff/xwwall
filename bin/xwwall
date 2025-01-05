@@ -52,7 +52,7 @@ if [[ -n "$WAYLAND_DISPLAY" ]]; then
 			Pos|Mak|Mod|Ser|Phy|Ena|Tra|Sca|Ada)
 			if [[ "${l:0:3}" == 'Pos' ]];then
 				export pos
-				pos=${m%,*};  echo POS=$pos >> "$TEMP/Wmonitor-$((c-1))"
+				pos=${m%,*};  Wmonitor[((c-1))]+="POS=$pos"$'\n'
 			else
 				continue
 			fi
@@ -65,12 +65,11 @@ if [[ -n "$WAYLAND_DISPLAY" ]]; then
 		esac
 		resX=${res%x*}
 		resY=${res#*x}
-		echo OUTPUT=$MON >> "$TEMP/Wmonitor-$c"
-		echo X=$resX >> "$TEMP/Wmonitor-$c"
-		echo Y=$resY >> "$TEMP/Wmonitor-$c"
+		Wmonitor[c]+="OUTPUT=$MON"$'\n'
+		Wmonitor[c]+="X=$resX"$'\n'
+		Wmonitor[c]+="Y=$resY"$'\n'
 		c=$((c+1))
 		b=$((b+1))
-#		echo $b > $TEMP/number
 		NUM=$b
 	done <<<$(wlr-randr)
 	export POPT='edge="top" dist="100"'
@@ -97,13 +96,12 @@ else
 		echo $resX
 		echo $resY
 		echo $pos
-		echo OUTPUT=$MON >> "$TEMP/Xmonitor-$n"
-		echo X=$resX >> "$TEMP/Xmonitor-$n"
-		echo Y=$resY >> "$TEMP/Xmonitor-$n"
-		echo POS=$pos >> "$TEMP/Xmonitor-$n"
+		Xmonitor[n]+="OUTPUT=$MON"$'\n'
+		Xmonitor[n]+="X=$resX"$'\n'
+		Xmonitor[n]+="Y=$resY"$'\n'
+		Xmonitor[n]+="POS=$pos"$'\n'
 		n=$((n+1))
 		k=$((k+1))
-#		echo $k > $TEMP/number
 		NUM=$k
 	done <<<$(xrandr --listmonitors)
 	export POPT='decorated="false"'
@@ -138,17 +136,15 @@ esac
 e=0
 export NUM
 if [[ -n "$WAYLAND_DISPLAY" ]]; then
-	for i in $TEMP/Wmonitor*
+	for i in "${Wmonitor[@]}"
 	do
 		# $i is sourced
-		. "$i"
-		[[ "$POS" == '0' ]] && echo "$OUTPUT = primary" && cp $i $TEMP/ww0
-		[[ "$POS" == "$X" ]] && echo "$OUTPUT = secondary" && cp $i $TEMP/ww1
-		[[ $POS -gt $X ]] && echo "$OUTPUT = extra" && cp $i $TEMP/ww2$e && e=$((e+1))
+		. <( printf '%s' "$i" )
+		[[ "$POS" == '0' ]] && echo "$OUTPUT = primary" && printf '%s' "$i" > $TEMP/ww0
+		[[ "$POS" == "$X" ]] && echo "$OUTPUT = secondary" && printf '%s' > "$i" $TEMP/ww1
+		[[ $POS -gt $X ]] && echo "$OUTPUT = extra" && printf '%s' "$i" > $TEMP/ww2$e && e=$((e+1))
 	done
-	rm $TEMP/Wmonitor* # finished with these
-#	read -r NUM < "$TEMP/number"
-#	export NUM
+	unset Wmonitor # finished with this array
 	echo $NUM outputs
 	. $TEMP/ww0
 	export Wdth=$((X / TWIDTH))
@@ -156,17 +152,15 @@ if [[ -n "$WAYLAND_DISPLAY" ]]; then
 	export MHght=$(((Y * 2 / 3) / 11 * THEIGHT))
 	echo "GUI: MWdth=$MWdth x MHght=$MHght"
 else
-	for f in $TEMP/Xmonitor*
+	for f in "${Xmonitor[@]}"
 	do
 		# $f is sourced
-		. "$f"
-		[[ "$POS" == '0' ]] && echo "$OUTPUT = primary" && cp $f $TEMP/xx0
-		[[ "$POS" == "$X" ]] && echo "$OUTPUT = secondary" && cp $f $TEMP/xx1
-		[[ $POS -gt $X ]] && echo "$OUTPUT = extra" && cp $i $TEMP/xx2$e && e=$((e+1))
+		. <( printf '%s' "$f" )
+		[[ "$POS" == '0' ]] && echo "$OUTPUT = primary" && printf '%s' "$f" > $TEMP/xx0
+		[[ "$POS" == "$X" ]] && echo "$OUTPUT = secondary" && printf '%s' "$f" > $TEMP/xx1
+		[[ $POS -gt $X ]] && echo "$OUTPUT = extra" && printf '%s' "$f" > $TEMP/xx2$e && e=$((e+1))
 	done
-	rm $TEMP/Xmonitor* # finished with these
-#	export NUM
-#	read NUM < $TEMP/number
+	unset Xmonitor # finished with this array
 	echo $NUM outputs
 	. $TEMP/xx0
 	export Wdth=$((X / TWIDTH))
